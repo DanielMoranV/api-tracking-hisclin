@@ -19,6 +19,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make(request()->all(), [
             'name' => 'required',
+            'dni' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:8',
         ]);
@@ -30,6 +31,9 @@ class AuthController extends Controller
         $user = new User;
         $user->name = request()->name;
         $user->email = request()->email;
+        $user->dni = request()->dni;
+        $user->phone = request()->phone;
+        $user->url_photo_profile = request()->url_photo_profile;
         $user->password = bcrypt(request()->password);
         $user->save();
 
@@ -44,12 +48,11 @@ class AuthController extends Controller
      */
     public function login()
     {
-        $credentials = request(['email', 'password']);
+        $credentials = request(['dni', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return $this->respondWithToken($token);
     }
 
@@ -60,7 +63,15 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json(auth()->user());
+        $user = auth()->user();
+        $role = $user->roles;
+
+        unset($user['roles']);
+        $user['role'] = $role[0]['name'];
+
+        return response()->json(
+            $user,
+        );
     }
 
     /**
