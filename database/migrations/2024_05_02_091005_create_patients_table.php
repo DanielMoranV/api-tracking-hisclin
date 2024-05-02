@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('clinic_history', function (Blueprint $table) {
+        Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('number');
-            $table->string('status');
-            $table->unsignedBigInteger('patient_id');
-            $table->foreign('patient_id')->references('id')->on('patients');
+            $table->string('dni')->unique();
+            $table->string('fullname');
+            $table->string('address')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('birthdate')->nullable();
+            $table->enum('document_type', ["DNI", "CE", "Pasaporte"])->default('DNI');
+            $table->enum('sex', ["Masculino", "Femenino"]);
         });
 
         Schema::enableForeignKeyConstraints();
@@ -30,9 +33,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::disableForeignKeyConstraints();
-
-        Schema::dropIfExists('clinic_history');
-
+        Schema::dropIfExists('patients');
         Schema::enableForeignKeyConstraints();
     }
 };
