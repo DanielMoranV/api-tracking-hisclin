@@ -67,10 +67,14 @@ class AuthController extends Controller
         $role = $user->roles;
 
         unset($user['roles']);
-        $user['role'] = $role[0]['name'];
+        //return $role;
+
+        $user['role'] = !isset($role) ? $role[0]['name'] : 'invitado';
+
+
 
         return response()->json(
-            $user,
+            $user
         );
     }
 
